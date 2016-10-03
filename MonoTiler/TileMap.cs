@@ -9,7 +9,6 @@ namespace MonoTiler
     {
         Camera2D camera;
         
-
         public MapTile[,] Grid;
         public int MapSizeX;
         public int MapSizeY;
@@ -80,7 +79,6 @@ namespace MonoTiler
 
         public void SetTile(int x, int y, int layer, int tileIndex, int tileSheetIndex)
         {
-            Console.WriteLine("X: " + x + " Y: " + y + " Layer: " + layer + " TileIndex: " + tileIndex + " TileSheet: " + tileSheetIndex);
             Grid[x, y].Layers[layer].TileIndex = tileIndex;
             Grid[x, y].Layers[layer].TileSheetIndex = tileSheetIndex;
         }
@@ -89,6 +87,7 @@ namespace MonoTiler
         {
             Grid[x, y].Layers[layer].TileIndex = -1;
             Grid[x, y].Layers[layer].TileSheetIndex = -1;
+            Console.WriteLine("Deleted Tile: ({0}|{1})", x, y);
         }
 
         public void SetPreview(int mapX, int mapY, int tileSheetIndex, int tileIndex)

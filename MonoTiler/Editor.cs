@@ -226,7 +226,6 @@ namespace MonoTiler
             scale = editorCamera.Zoom;
             mapPreview();
 
-
             switch (currentState)
             {
                 case EditorStates.Layer1:
@@ -234,6 +233,10 @@ namespace MonoTiler
                         if ((mouState.LeftButton == ButtonState.Pressed) && (mouState_old.LeftButton == ButtonState.Released))
                         {
                             mapPlacement(0, tileSelected, currentTileSheet);
+                        }
+                        if ((mouState.RightButton == ButtonState.Pressed) == (mouState_old.RightButton == ButtonState.Released))
+                        {
+                            deleteTile(0);
                         }
                         break;
                     }
@@ -243,6 +246,10 @@ namespace MonoTiler
                         {
                             mapPlacement(1, tileSelected, currentTileSheet);
                         }
+                        if ((mouState.RightButton == ButtonState.Pressed) == (mouState_old.RightButton == ButtonState.Released))
+                        {
+                            deleteTile(1);
+                        }
                     }
                     break;
                 case EditorStates.Layer3:
@@ -251,6 +258,10 @@ namespace MonoTiler
                         {
                             mapPlacement(2, tileSelected, currentTileSheet);
                         }
+                        if ((mouState.RightButton == ButtonState.Pressed) == (mouState_old.RightButton == ButtonState.Released))
+                        {
+                            deleteTile(2);
+                        }
                     }
                     break;
                 case EditorStates.Layer4:
@@ -258,6 +269,10 @@ namespace MonoTiler
                         if ((mouState.LeftButton == ButtonState.Pressed) && (mouState_old.LeftButton == ButtonState.Released))
                         {
                             mapPlacement(3, tileSelected, currentTileSheet);
+                        }
+                        if ((mouState.RightButton == ButtonState.Pressed) == (mouState_old.RightButton == ButtonState.Released))
+                        {
+                            deleteTile(3);
                         }
                     }
                     break;
@@ -271,13 +286,20 @@ namespace MonoTiler
         void mapPlacement(int layer, int tileIndex, int tileSheetIndex)
         {
             //converts mouseposition to Map position
-            Console.WriteLine("Mouse: " + "(" + mouseX + "|" + mouseY + ")");
             int xPos = (mouseX - mapOffsetX) / (int)(32 * scale);
             int yPos = (mouseY - mapOffsetY) / (int)(32 * scale);
             Console.WriteLine("Posti: " + "(" + xPos + "|" + yPos + ")");
             if (xPos >= map.MapSizeX || yPos >= map.MapSizeY || xPos < 0 || yPos < 0)
                 return;
             map.SetTile(xPos, yPos, layer, tileIndex, tileSheetIndex);
+        }
+
+        void deleteTile(int layer)
+        {
+            Vector2 pos = mouseToMapPosition();
+            if (pos.X >= map.MapSizeX || pos.Y >= map.MapSizeY || pos.X < 0 || pos.Y < 0)
+                return;
+            map.DeleteTile((int)pos.X, (int)pos.Y, layer);
         }
 
         Vector2 mouseToMapPosition()
