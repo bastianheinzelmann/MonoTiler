@@ -97,5 +97,10 @@ namespace MonoTiler
             previewTileIndex = tileIndex;
             previewTileSheetIndex = tileSheetIndex;
         }
+
+        public void SetCollision(int mapX, int mapY, CollisionType collision)
+        {
+            Grid[mapX, mapY].Collision = collision;
+        }
     }
 }

@@ -41,7 +41,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CollisionType.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="TileMap.cs" />
     <Compile Include="MapTile.cs" />

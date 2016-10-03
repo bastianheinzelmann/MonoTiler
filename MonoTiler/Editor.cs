@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.IO;
 
 namespace MonoTiler
 {
@@ -38,6 +39,7 @@ namespace MonoTiler
         TextButton Layer3Button;
         TextButton Layer4Button;
         TextButton CollisionLayerButton;
+        TextButton SaveButton;
 
         //Map-Stuff
         EditorStates currentState = EditorStates.Layer1;
@@ -85,6 +87,7 @@ namespace MonoTiler
             Layer2Button = new TextButton("Layer 2", TextureContainer.Font, editorView.Width + 10, 50, 0, Color.White, TextureContainer.YellowSquare);
             Layer3Button = new TextButton("Layer 3", TextureContainer.Font, editorView.Width + 10, 80, 0, Color.White, TextureContainer.YellowSquare);
             Layer4Button = new TextButton("Layer 4", TextureContainer.Font, editorView.Width + 10, 110, 0, Color.White, TextureContainer.YellowSquare);
+            SaveButton = new TextButton("Save", TextureContainer.Font, editorView.Width + 10, 140, 0, Color.Black, TextureContainer.YellowSquare);
         }
 
         public void Update(GameTime gameTime)
@@ -133,6 +136,7 @@ namespace MonoTiler
             Layer2Button.Draw(spriteBatch);
             Layer3Button.Draw(spriteBatch);
             Layer4Button.Draw(spriteBatch);
+            SaveButton.Draw(spriteBatch);
             spriteBatch.End();
         }
 
@@ -150,6 +154,10 @@ namespace MonoTiler
             Layer4Button.Update();
             if (Layer4Button.ButtonPressed)
                 currentState = EditorStates.Layer4;
+
+            SaveButton.Update();
+            if (SaveButton.ButtonPressed)
+                SaveMap("test.mt");
 
             //Highlight Button
             if (currentState == EditorStates.Layer1)
@@ -315,6 +323,33 @@ namespace MonoTiler
             if (pos.X >= map.MapSizeX || pos.Y >= map.MapSizeY || pos.X < 0 || pos.Y < 0)
                 return;
             map.SetPreview((int)pos.X, (int)pos.Y, currentTileSheet, tileSelected);
+        }
+
+        #endregion
+
+        #region Save the shit out of the map
+
+        public void SaveMap(string fileName)
+        {
+            using (StreamWriter writer = new StreamWriter(fileName))
+            {
+                int width = map.MapSizeX, height = map.MapSizeY;
+                writer.Write(width.ToString() + ","); writer.Write(height.ToString() + ","); writer.WriteLine();
+                writer.Write(32.ToString()); writer.WriteLine(); //Tilesize
+                foreach(MapTile tile in map.Grid)
+                {
+                    for (int layer = 0; layer < 4; layer++)
+                    {
+                        writer.Write(tile.X.ToString() + "," + tile.Y.ToString() + ",");
+                        writer.Write(tile.Layers[layer].TileIndex.ToString() + ",");
+                        writer.Write(tile.Layers[layer].TileSheetIndex.ToString()+ ",");
+                    }
+                    writer.WriteLine();
+                }
+            }
+
+            Console.WriteLine("File saved!");
+            
         }
 
         #endregion

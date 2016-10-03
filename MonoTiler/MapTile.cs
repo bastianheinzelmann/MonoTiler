@@ -4,6 +4,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MonoTiler
 {
+    enum CollisionType
+    {
+        Solid,
+        Liquid,
+        None
+    }
+
     class MapTile
     {
         public int X;
@@ -13,7 +20,7 @@ namespace MonoTiler
 
         public CollisionType Collision;
         
-        public MapTile(int x, int y, Tuple tileIndex1, Tuple tileIndex2, Tuple tileIndex3, Tuple tileIndex4, CollisionType collision)
+        public MapTile(int x, int y, Tuple tileIndex1, Tuple tileIndex2, Tuple tileIndex3, Tuple tileIndex4, CollisionType collision = CollisionType.Solid)
         {
             Layers[0] = tileIndex1;
             Layers[1] = tileIndex2;
@@ -28,12 +35,8 @@ namespace MonoTiler
             {
                 Layers[i].TileIndex = -1;
                 Layers[i].TileSheetIndex = -1;
+                Collision = CollisionType.None;
             }
-        }     
-        
-        public void Draw(SpriteBatch spriteBatch)
-        {
-
-        }  
+        }
     }
 }
