@@ -19,6 +19,8 @@ namespace MonoTiler
 
     class Editor
     {
+        public string FileName;
+
         ContentManager content;
 
         TileSheet[] tileSheets;
@@ -56,8 +58,9 @@ namespace MonoTiler
         GraphicsDeviceManager graphics;
 
 
-        public Editor(int mapWidth, int mapHeight,int tileSize,Viewport view,ContentManager content,GraphicsDeviceManager graphics,params string[] tileSheets)
+        public Editor(string fileName,int mapWidth, int mapHeight,int tileSize,Viewport view,ContentManager content,GraphicsDeviceManager graphics)
         {
+            FileName = fileName;
             this.content = content;
             this.graphics = graphics;
             //---------------------------------------------------------
@@ -70,10 +73,10 @@ namespace MonoTiler
             editorCamera = new Camera2D(editorView);
             tileSelectionCamera = new TileSelectionCamera(tileSelectionView);
 
-            editorStartUp();
+            editorStartUp(mapWidth, mapHeight);
         }
 
-        void editorStartUp()
+        void editorStartUp(int mapWidth, int mapHeight)
         {
             //Load tileSheets
             //the first tileSheet in tileSheets has the index 0 the second 1 and so on (importan for the map and drawing)
@@ -81,7 +84,7 @@ namespace MonoTiler
             tileSheets[0] = new TileSheet(0, 32, 0, 0, content.Load<Texture2D>("Liberty_A4_1"));
 
             //------------initialization of the map---------------------
-            map = new TileMap(20, 8, editorCamera, tileSheets);
+            map = new TileMap(mapWidth, mapHeight, editorCamera, tileSheets);
             // initialize Buttons
             Layer1Button = new TextButton("Layer 1", TextureContainer.Font, editorView.Width + 10, 20 ,0 ,Color.White, TextureContainer.YellowSquare);
             Layer2Button = new TextButton("Layer 2", TextureContainer.Font, editorView.Width + 10, 50, 0, Color.White, TextureContainer.YellowSquare);
@@ -157,7 +160,7 @@ namespace MonoTiler
 
             SaveButton.Update();
             if (SaveButton.ButtonPressed)
-                SaveMap("test.mt");
+                SaveMap();
 
             //Highlight Button
             if (currentState == EditorStates.Layer1)
@@ -327,29 +330,58 @@ namespace MonoTiler
 
         #endregion
 
-        #region Save the shit out of the map
+        #region Save and load the shit out of the map
 
-        public void SaveMap(string fileName)
+        public void SaveMap()
         {
-            using (StreamWriter writer = new StreamWriter(fileName))
+            using (StreamWriter writer = new StreamWriter(FileName + ".mt"))
             {
                 int width = map.MapSizeX, height = map.MapSizeY;
                 writer.Write(width.ToString() + ","); writer.Write(height.ToString() + ","); writer.WriteLine();
-                writer.Write(32.ToString()); writer.WriteLine(); //Tilesize
+                writer.Write(32.ToString() + ","); writer.WriteLine(); //Tilesize
                 foreach(MapTile tile in map.Grid)
                 {
+                    writer.Write(tile.X.ToString() + "," + tile.Y.ToString() + ",");
                     for (int layer = 0; layer < 4; layer++)
                     {
-                        writer.Write(tile.X.ToString() + "," + tile.Y.ToString() + ",");
                         writer.Write(tile.Layers[layer].TileIndex.ToString() + ",");
                         writer.Write(tile.Layers[layer].TileSheetIndex.ToString()+ ",");
                     }
                     writer.WriteLine();
                 }
             }
+            Console.WriteLine("File saved!");          
+        }
 
-            Console.WriteLine("File saved!");
-            
+        public static Editor LoadMap(string fileName, Viewport view, ContentManager content, GraphicsDeviceManager graphics)
+        {
+            Editor editor;
+
+            using (StreamReader reader = new StreamReader(fileName))
+            {
+                string line = reader.ReadLine(); string[] parts = line.Split(',');
+                int width = Convert.ToInt32(parts[0]); int height = Convert.ToInt32(parts[1]);
+                line = reader.ReadLine(); parts = line.Split(',');
+                int tileSize = Convert.ToInt32(parts[0]);
+
+                editor = new Editor(fileName, width, height, 32, view, content, graphics);
+
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        line = reader.ReadLine(); parts = line.Split(',');
+                        Console.WriteLine(parts.Length + " " + parts[0]);
+                        editor.map.SetTile(i, j, 0, Convert.ToInt32(parts[2]), Convert.ToInt32(parts[3]));
+                        editor.map.SetTile(i, j, 1, Convert.ToInt32(parts[4]), Convert.ToInt32(parts[5]));
+                        editor.map.SetTile(i, j, 2, Convert.ToInt32(parts[6]), Convert.ToInt32(parts[7]));
+                        editor.map.SetTile(i, j, 3, Convert.ToInt32(parts[8]), Convert.ToInt32(parts[9]));
+                    }
+                }
+
+            }
+            Console.WriteLine("Loading successfull!");
+            return editor;
         }
 
         #endregion

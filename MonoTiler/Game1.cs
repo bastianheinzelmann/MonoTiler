@@ -77,14 +77,17 @@ namespace MonoTiler
                 startMenu.Draw(spriteBatch, gameTime);
                 spriteBatch.End();
             }
-
             base.Draw(gameTime);
         }
 
-        public void CreateEditor(string file)
+        public void CreateEditor(string fileName, int mapWidth, int mapHeight,int tileSize)
         {
-            editor = new Editor(0, 0, 32, GraphicsDevice.Viewport, Content, graphics);
+            editor = new Editor(fileName, mapWidth, mapHeight, 32, GraphicsDevice.Viewport, Content, graphics);
         }
 
+        public void LoadEditor(string fileName)
+        {
+            editor = Editor.LoadMap(fileName, GraphicsDevice.Viewport, Content, graphics);
+        }
     }
 }

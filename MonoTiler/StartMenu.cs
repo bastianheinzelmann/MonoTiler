@@ -14,7 +14,7 @@ namespace MonoTiler
 
         SpriteFont font;
 
-        bool coordinateInput = false;
+        bool newMapDataInput = false;
         bool loadFileInput = false;
 
         public StartMenu(SpriteFont _font, Game1 game)
@@ -27,13 +27,13 @@ namespace MonoTiler
 
         public void Update(GameTime gameTime)
         {
-            if(coordinateInput)
+            if(newMapDataInput)
                 textBox.Update(gameTime);
             loadButton.Update();
             newMapButton.Update();
             if (newMapButton.ButtonPressed)
             {
-                coordinateInput = true;
+                newMapDataInput = true;
                 textBox = new UITextBox(game.Window, TextureContainer.BlackSquare, TextureContainer.WhiteSquare, font, 0, 0, 200);
             }
             if(loadButton.ButtonPressed)
@@ -41,9 +41,14 @@ namespace MonoTiler
                 loadFileInput = true;
                 textBox = new UITextBox(game.Window, TextureContainer.BlackSquare, TextureContainer.WhiteSquare, font, 0, 0, 200);
             }
-            if((coordinateInput || loadFileInput) && Keyboard.GetState().IsKeyDown(Keys.Enter) )
+            if(newMapDataInput && Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
-                game.CreateEditor("");
+                game.CreateEditor(parseInput(0), Int32.Parse(parseInput(1)), Int32.Parse(parseInput(2)), Int32.Parse(parseInput(3)));
+                Game1.EditMode = true;
+            }
+            if(loadFileInput && Keyboard.GetState().IsKeyDown(Keys.Enter))
+            {
+                game.LoadEditor(textBox.GetText());
                 Game1.EditMode = true;
             }
         }
@@ -52,8 +57,14 @@ namespace MonoTiler
         {
             loadButton.Draw(spriteBatch);
             newMapButton.Draw(spriteBatch);
-            if(coordinateInput || loadFileInput)
+            if(newMapDataInput || loadFileInput)
                 textBox.Draw(spriteBatch, gameTime);
+        }
+
+        string parseInput(int position)
+        {
+            string[] parts = textBox.GetText().Split(',');
+            return parts[position];
         }
 
     }
